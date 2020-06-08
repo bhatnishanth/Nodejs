@@ -5,7 +5,7 @@ var User=require('../models/user');
 var passport=require('passport');
 var router=express.Router();
 router.use(bodyParser.json());
-
+var authenticate=require('../authenticate');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -32,11 +32,13 @@ router.post('/signup',function(req,res,next){
   });
 });
 router.post('/login',passport.authenticate('local'),(req,res)=>{
-  res.statusCode=200;
+      var token=authenticate.getToken({
+        _id:req.user._id
+      });
+
+      res.statusCode=200;
       res.setHeader('Content-Type','application/json');
-      res.json({success:true,status:'You are successfully logged in'});
-      
-  
+      res.json({token:token,success:true,status:'You are successfully logged in'});
 });
 
 
