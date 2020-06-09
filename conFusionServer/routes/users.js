@@ -8,9 +8,10 @@ router.use(bodyParser.json());
 var authenticate=require('../authenticate');
 
 /* GET users listing. */
-
+const cors=require('./cors');
 router.route('/')
-.get( authenticate.verifyUser,authenticate.verifyAdmin,function(req, res, next) {
+
+.get( cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,function(req, res, next) {
   User.find({})
   .populate('comments.author')
   .then((users)=>{
@@ -21,7 +22,7 @@ router.route('/')
 });
 
 
-router.post('/signup',function(req,res,next){
+router.post('/signup',cors.corsWithOptions,function(req,res,next){
   User.register(new User({username:req.body.username}),
   req.body.password,(err,user)=>{
   
@@ -52,7 +53,7 @@ router.post('/signup',function(req,res,next){
    }
   });
 });
-router.post('/login',passport.authenticate('local'),(req,res)=>{
+router.post('/login',cors.corsWithOptions,passport.authenticate('local'),(req,res)=>{
       var token=authenticate.getToken({
         _id:req.user._id
       });
@@ -63,7 +64,7 @@ router.post('/login',passport.authenticate('local'),(req,res)=>{
 });
 
 
-router.get('/logout',(req,res)=>{
+router.get('/logout',cors.corsWithOptions,(req,res)=>{
   if(req.session){
     req.session.destroy();
     res.clearCookie('session-id');
